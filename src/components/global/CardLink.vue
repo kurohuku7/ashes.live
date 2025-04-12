@@ -6,31 +6,27 @@
         ref="link"
         :to="cardTarget"
         @pointerover="queueShowDetails"
-        @pointerleave="closeDetails">
-      <slot>{{ card.name }}</slot>
+        @pointerleave="closeDetails"
+      >
+        <slot>{{ card.name }}</slot>
       </router-link>
     </span>
     <div ref="popup" class="absolute z-50" @mouseleave="closeDetails">
       <div
         v-if="card.is_legacy && isCurrentTarget"
         class="border-8 border-gray-light bg-gray-light text-gray rounded-lg shadow relative"
-        ref="popup">
-        <i
-          class="fas fa-circle-notch fa-spin text-2xl"
-          :class="[$style.centerPosition]"></i>
-        <img
-          width="299"
-          height="418"
-          class="relative"
-          :src="legacyCardURL"
-          :alt="card.name">
+        ref="popup"
+      >
+        <i class="fas fa-circle-notch fa-spin text-2xl" :class="[$style.centerPosition]"></i>
+        <img width="299" height="418" class="relative" :src="legacyCardURL" :alt="card.name" />
       </div>
       <card
         v-else-if="isCurrentTarget"
         ref="popup"
         class="text-left text-black"
         :card="details"
-        is-popup></card>
+        is-popup
+      ></card>
     </div>
   </span>
 </template>
@@ -49,7 +45,7 @@ export default {
   components: {
     Card,
   },
-  data () {
+  data() {
     return {
       loadingDetails: false,
       details: null,
@@ -59,31 +55,31 @@ export default {
       pointerType: 'mouse',
     }
   },
-  beforeMount () {
-     this.linkId = `${this.card.stub}-${Math.random()}`
+  beforeMount() {
+    this.linkId = `${this.card.stub}-${Math.random()}`
   },
-  beforeUnmount () {
+  beforeUnmount() {
     // Ensure that we don't have any lingering listeners
     this.cleanupEventListeners()
   },
   computed: {
     ...mapState(['displayedIds']),
     isCurrentTarget() {
-      return this.displayedIds.includes(this.linkId);
+      return this.displayedIds.includes(this.linkId)
     },
-    cardTarget () {
+    cardTarget() {
       const routeName = !this.card.is_legacy ? 'CardDetails' : 'CardDetailsLegacy'
       return {
         name: routeName,
         params: { stub: this.card.stub },
       }
     },
-    legacyCardURL () {
+    legacyCardURL() {
       return `${import.meta.env.VITE_CDN_URL}/legacy/images/cards/${this.card.stub}.png`
     },
-    useHoverLogic () {
+    useHoverLogic() {
       return this.pointerType === 'mouse'
-    }
+    },
   },
   methods: {
     ...mapMutations(['addDisplayedId', 'clearSelfAndDescendents']),
@@ -107,44 +103,50 @@ export default {
     * `pointerleave`: for consistency we're watching for the mouse to exit on pointerleave, but this
       could equally well be mouseleave.
     */
-    queueShowDetails (event) {
+    queueShowDetails(event) {
       // Save our pointer mode so that we can check if we need to open the details popup on click
       // (or just let the click event happen normally)
       this.pointerType = event.pointerType
       // Only queue up our details on a delay if we are using a device that hovers and aren't already loading or viewing things
-      if (!this.useHoverLogic || this.loadingDetails || this.isCurrentTarget || this.checkOpenTimeout) return
+      if (
+        !this.useHoverLogic ||
+        this.loadingDetails ||
+        this.isCurrentTarget ||
+        this.checkOpenTimeout
+      )
+        return
       this.checkOpenTimeout = setTimeout(this.showDetails, 200)
     },
-    linkClick (event) {
+    linkClick(event) {
       // We only want to cancel the default link behavior if we are handling touch input (thus don't have hover logic) and do not already have the details open
       if (!this.useHoverLogic && !this.isCurrentTarget) {
         event.preventDefault()
         return this.showDetails()
       }
     },
-    closeOnClick (event) {
+    closeOnClick(event) {
       // If the click was outside our open element, then close the popper
       if (!this.$refs.link.$el.contains(event.target) && !this.$refs.popup.contains(event.target)) {
         event.preventDefault()
-        this.clearSelfAndDescendents({ id: this.linkId });
+        this.clearSelfAndDescendents({ id: this.linkId })
         this.popper.destroy()
         this.cleanupEventListeners()
       }
       // Otherwise, just leave things well enough alone
     },
-    clearOpenTimeout () {
+    clearOpenTimeout() {
       if (this.checkOpenTimeout) {
         clearTimeout(this.checkOpenTimeout)
         this.checkOpenTimeout = null
       }
     },
-    clearCloseTimeout () {
+    clearCloseTimeout() {
       if (this.checkCloseTimeout) {
         clearTimeout(this.checkCloseTimeout)
         this.checkCloseTimeout = null
       }
     },
-    async showDetails () {
+    async showDetails() {
       if (this.loadingDetails) return
       this.loadingDetails = true
 
@@ -187,7 +189,7 @@ export default {
                 'left-start',
                 'left-end',
                 'top',
-                'bottom'
+                'bottom',
               ],
             },
           },
@@ -201,12 +203,12 @@ export default {
         this.popper.forceUpdate()
       })
     },
-    cleanupEventListeners () {
+    cleanupEventListeners() {
       document.removeEventListener('click', this.closeOnClick, true)
-      this.clearCloseTimeout();
-      this.clearOpenTimeout();
+      this.clearCloseTimeout()
+      this.clearOpenTimeout()
     },
-    closeDetails () {
+    closeDetails() {
       this.clearOpenTimeout()
       if (!this.isCurrentTarget) return
       this.clearCloseTimeout()

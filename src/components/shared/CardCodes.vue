@@ -22,16 +22,16 @@ export default {
       default: false,
     },
   },
-  setup (props) {
+  setup(props) {
     // Setup accepts a reactive `props` object and can return a render function, so this
     // functionally allows us to compile arbitrary HTML into Vue components
-    let cardText = props.isCardEffect ? parseEffectText(props.content, props.isLegacy) : parseFormattedText(props.content, props.needsParagraphs, props.isLegacy)
+    let cardText = props.isCardEffect
+      ? parseEffectText(props.content, props.isLegacy)
+      : parseFormattedText(props.content, props.needsParagraphs, props.isLegacy)
     if (props.needsParagraphs && !props.isCardEffect) {
       cardText = `<div class="parsed-text">${cardText}</div>`
     }
-    return compile(
-      cardText
-    )
+    return compile(cardText)
   },
 }
 </script>

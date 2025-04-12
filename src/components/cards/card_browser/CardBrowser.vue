@@ -5,27 +5,34 @@
         class="flex-none mb-4 h-10 md:pr-4"
         v-model:filter-logic="diceFilterLogic"
         v-model:filter-list="diceFilterList"
-        :is-disabled="isDisabled"></dice-filter>
+        :is-disabled="isDisabled"
+      ></dice-filter>
       <clearable-search
         class="flex-1 h-10 mb-4"
         placeholder="Filter by name or text..."
         v-model:search="filterText"
-        :is-disabled="isDisabled"></clearable-search>
+        :is-disabled="isDisabled"
+      ></clearable-search>
     </div>
     <div class="flex flex-nowrap">
       <type-filter
         class="flex-auto"
         v-model:filter-list="typeFilterList"
-        :is-disabled="isDisabled"></type-filter>
+        :is-disabled="isDisabled"
+      ></type-filter>
       <div class="flex-none mb-4 mr-2">
         <button
           v-if="isDeckbuilderActive"
           class="btn py-1 px-2 font-normal text-sm"
-          :class="{active: deckbuilderMode}"
+          :class="{ active: deckbuilderMode }"
           :title="`${deckbuilderMode ? 'Show' : 'Hide'} conjurations and Phoenixborn`"
-          @click="deckbuilderMode = !deckbuilderMode">
-          <i class="fa-minus-square" :class="{far: !deckbuilderMode, fas: deckbuilderMode}"></i>
-          <span class="alt-text"><span v-if="deckbuilderMode">Show</span><span v-else>Hide</span> conjurations and Phoenixborn</span>
+          @click="deckbuilderMode = !deckbuilderMode"
+        >
+          <i class="fa-minus-square" :class="{ far: !deckbuilderMode, fas: deckbuilderMode }"></i>
+          <span class="alt-text"
+            ><span v-if="deckbuilderMode">Show</span><span v-else>Hide</span> conjurations and
+            Phoenixborn</span
+          >
         </button>
       </div>
       <collection-filter
@@ -34,7 +41,8 @@
         v-model:release-list="collectionReleaseList"
         :show-legacy="showLegacy"
         :is-disabled="isDisabled"
-        @force-filtration="filterList"></collection-filter>
+        @force-filtration="filterList"
+      ></collection-filter>
     </div>
     <div class="flex flex-wrap sm:flex-nowrap">
       <card-sort
@@ -42,11 +50,13 @@
         v-model:sort="sort"
         v-model:order="order"
         :is-phoenixborn-picker="isPhoenixbornPicker"
-        :is-disabled="isDisabled"></card-sort>
+        :is-disabled="isDisabled"
+      ></card-sort>
       <gallery-picker
         v-if="!showLegacy"
         class="mb-4 flex-none"
-        :is-disabled="isDisabled"></gallery-picker>
+        :is-disabled="isDisabled"
+      ></gallery-picker>
     </div>
     <card-table
       :is-disabled="isDisabled"
@@ -56,7 +66,8 @@
       :gallery-style="galleryStyle"
       :show-legacy="showLegacy"
       @reset-filters="clearFilters"
-      @load-more="loadNext"></card-table>
+      @load-more="loadNext"
+    ></card-table>
   </div>
 </template>
 
@@ -73,7 +84,7 @@ import CardSort from './CardSort.vue'
 import GalleryPicker from './GalleryPicker.vue'
 import CardTable from './CardTable.vue'
 
-function ensureArray (value) {
+function ensureArray(value) {
   if (value === undefined) return []
   return Array.isArray(value) ? value : [value]
 }
@@ -84,7 +95,7 @@ export default {
     isPhoenixbornPicker: Boolean,
     showLegacy: Boolean,
   },
-  setup () {
+  setup() {
     // Expose toasts for use in other portions of this component
     return { toast: useToast() }
   },
@@ -114,7 +125,7 @@ export default {
     GalleryPicker,
     CardTable,
   },
-  created () {
+  created() {
     /**
      * Create debounced methods and setup filter watching logic
      *
@@ -235,12 +246,12 @@ export default {
     // And finally, trigger our first listing load
     this.filterList()
   },
-  unmounted () {
+  unmounted() {
     // Cancel pending debounces, if necessary
     this.debouncedFilterCall.cancel()
   },
   watch: {
-    '$route.query' (to, from) {
+    '$route.query'(to, from) {
       // TODO: Figure out a better way to handle this; this code gets called extraneously every
       // time the query string is updated (even when we're updating due to in-page controls).
       // I tried to use beforeRouteUpdate guard, but it never triggered on query string changes.
@@ -269,7 +280,7 @@ export default {
         this.collectionReleaseList = ensureArray(to.r)
       }
     },
-    isDeckbuilderActive (to, from) {
+    isDeckbuilderActive(to, from) {
       if (to && !from && this.deckbuilderMode) {
         this.ensureNoConjurationFilter()
         this.filterList()
@@ -277,27 +288,27 @@ export default {
     },
   },
   computed: {
-    galleryStyle () {
+    galleryStyle() {
       if (this.showLegacy) return 'list'
       return this.$store.state.options.galleryStyle
     },
     collectionFilterLogic: {
-      get () {
+      get() {
         return this.$store.state.options.releaseFilter
       },
-      set (newValue) {
+      set(newValue) {
         this.$store.commit('options/setReleaseFilter', newValue)
         this.filterList()
       },
     },
-    isDeckbuilderActive () {
+    isDeckbuilderActive() {
       return this.$store.state.builder.enabled
     },
     deckbuilderMode: {
-      get () {
+      get() {
         return this.$store.state.options.deckbuilderMode
       },
-      set (newValue) {
+      set(newValue) {
         this.$store.commit('options/setDeckbuilderMode', newValue)
         // If we are in deckbuilder mode, make sure that 'conjurations' is removed from our filters
         if (newValue) this.ensureNoConjurationFilter()
@@ -308,7 +319,7 @@ export default {
   methods: {
     // Clear out filters; this will automatically cause the card listing to be refreshed due to the
     // `watch` logic above
-    clearFilters () {
+    clearFilters() {
       this.filterText = ''
       this.diceFilterLogic = 'only'
       this.diceFilterList = []
@@ -325,82 +336,90 @@ export default {
      *   See https://github.com/axios/axios#request-config
      * * `failureCallback`: an optional callback that will be invoked on failure
      */
-    fetchCards ({endpoint = null, options = {}, failureCallback = null, pushToRouter = true} = {}) {
+    fetchCards({
+      endpoint = null,
+      options = {},
+      failureCallback = null,
+      pushToRouter = true,
+    } = {}) {
       if (!endpoint) {
         endpoint = '/v2/cards'
       }
       this.isDisabled = true
-      request(endpoint, options).then((response) => {
-        // Update our query string with the currently set filters
-        const query = {}
-        if (this.filterText) {
-          query.q = this.filterText
-        }
-        if (this.diceFilterList.length) {
-          query.dice = this.diceFilterList
-        }
-        if (this.diceFilterLogic && this.diceFilterLogic !== 'only') {
-          query.dice_logic = this.diceFilterLogic
-        }
-        if (this.typeFilterList.length) {
-          query.types = this.typeFilterList
-        }
-        if (this.collectionFilterLogic === 'all' && this.collectionReleaseList.length) {
-          query.r = this.collectionReleaseList
-        }
-        if (this.sort !== 'name') {
-          query.sort = this.sort
-        }
-        if (this.order !== 'asc') {
-          query.order = this.order
-        }
-        if (pushToRouter) {
-          this.$router.push({
-            path: this.$route.path,
-            query: query,
-          })
-        }
-        // Clear everything out if we have no actual results (makes logical comparisons easier)
-        if (response.data.count === 0) {
-          this.cards = null
-          this.nextCardsURL = null
-          return
-        }
-        // Ensure we have a list to work with
-        if (!this.cards) this.cards = []
-        // If we have a previous link, then that means we are loading paginated results (so concat)
-        if (response.data.previous) {
-          this.cards = this.cards.concat(response.data.results)
-        } else {
-          // Otherwise, we're loading a newly filtered list
-          this.cards = response.data.results
-        }
-        this.nextCardsURL = response.data.next
-        // Add cards to the Vuex store so that we don't need to fetch individual cards via AJAX
-        // when viewing their details around the site (during this session, at least)
-        this.$store.commit('cards/addCards', response.data.results)
-      }).catch((error) => {
-        let errorMessage = 'Failed to fetch card listing. Please report if this fails repeatedly!'
-        if (error.response.status === 422) {
-          // TODO: write a generic function to parse the validation response from FastAPI
-          errorMessage = 'Failed to fetch card listing (validation failure)!'
-        } else if (error.data && error.data.detail) {
-          errorMessage = error.response.data.detail
-        }
-        this.toast.error(errorMessage)
-        // Reset the filters, if necessary
-        if (failureCallback) failureCallback()
-      }).finally(() => {
-        this.isDisabled = false
-      })
+      request(endpoint, options)
+        .then((response) => {
+          // Update our query string with the currently set filters
+          const query = {}
+          if (this.filterText) {
+            query.q = this.filterText
+          }
+          if (this.diceFilterList.length) {
+            query.dice = this.diceFilterList
+          }
+          if (this.diceFilterLogic && this.diceFilterLogic !== 'only') {
+            query.dice_logic = this.diceFilterLogic
+          }
+          if (this.typeFilterList.length) {
+            query.types = this.typeFilterList
+          }
+          if (this.collectionFilterLogic === 'all' && this.collectionReleaseList.length) {
+            query.r = this.collectionReleaseList
+          }
+          if (this.sort !== 'name') {
+            query.sort = this.sort
+          }
+          if (this.order !== 'asc') {
+            query.order = this.order
+          }
+          if (pushToRouter) {
+            this.$router.push({
+              path: this.$route.path,
+              query: query,
+            })
+          }
+          // Clear everything out if we have no actual results (makes logical comparisons easier)
+          if (response.data.count === 0) {
+            this.cards = null
+            this.nextCardsURL = null
+            return
+          }
+          // Ensure we have a list to work with
+          if (!this.cards) this.cards = []
+          // If we have a previous link, then that means we are loading paginated results (so concat)
+          if (response.data.previous) {
+            this.cards = this.cards.concat(response.data.results)
+          } else {
+            // Otherwise, we're loading a newly filtered list
+            this.cards = response.data.results
+          }
+          this.nextCardsURL = response.data.next
+          // Add cards to the Vuex store so that we don't need to fetch individual cards via AJAX
+          // when viewing their details around the site (during this session, at least)
+          this.$store.commit('cards/addCards', response.data.results)
+        })
+        .catch((error) => {
+          let errorMessage = 'Failed to fetch card listing. Please report if this fails repeatedly!'
+          if (error.response.status === 422) {
+            // TODO: write a generic function to parse the validation response from FastAPI
+            errorMessage = 'Failed to fetch card listing (validation failure)!'
+          } else if (error.data && error.data.detail) {
+            errorMessage = error.response.data.detail
+          }
+          this.toast.error(errorMessage)
+          // Reset the filters, if necessary
+          if (failureCallback) failureCallback()
+        })
+        .finally(() => {
+          this.isDisabled = false
+        })
     },
     // Default method for running a new filter using the current filter settings
-    filterList (failureCallback) {
+    filterList(failureCallback) {
       // Query our list of cards
       const params = {
-        'limit': 50,
-        'sort': this.sort,
-        'order': this.order,
+        limit: 50,
+        sort: this.sort,
+        order: this.order,
       }
       // Show legacy cards, if necessary
       if (this.showLegacy) {
@@ -431,7 +450,11 @@ export default {
       // * The deckbuilder is actually active
       // * We've opted into the mode
       // * We are not viewing Phoenixborn (because in that case they're probably trying to switch PBs)
-      if (this.isDeckbuilderActive && this.deckbuilderMode && !this.typeFilterList.includes('phoenixborn')) {
+      if (
+        this.isDeckbuilderActive &&
+        this.deckbuilderMode &&
+        !this.typeFilterList.includes('phoenixborn')
+      ) {
         params.mode = 'deckbuilder'
         if (this.$store.state.builder.deck.phoenixborn) {
           params.include_uniques_for = this.$store.state.builder.deck.phoenixborn.name
@@ -440,10 +463,10 @@ export default {
       this.fetchCards({ options: { params }, failureCallback })
     },
     // Load the next page of cards
-    loadNext () {
+    loadNext() {
       this.fetchCards({ endpoint: this.nextCardsURL, pushToRouter: false })
     },
-    ensureNoConjurationFilter () {
+    ensureNoConjurationFilter() {
       if (this.typeFilterList.includes('conjurations')) {
         this.typeFilterList.splice(this.typeFilterList.indexOf('conjurations'), 1)
       }
