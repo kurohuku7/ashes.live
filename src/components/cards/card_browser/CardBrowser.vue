@@ -108,7 +108,7 @@ export default {
       typeFilterList: [],
       // collectionFilterLogic is defined as a computed property off the store
       collectionReleaseList: [],
-      sort: 'name',
+      sort: 'release',
       order: 'asc',
       // This is the list of cards currently shown
       cards: null,
