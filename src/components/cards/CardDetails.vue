@@ -417,20 +417,29 @@ export default {
     async saveJapaneseText() {
       this.card.name_ja = document.querySelector('#name-ja').textContent.trim()
 
-      // 疲労トークンをテキストに保存するために追加
-      console.log(document.querySelectorAll('#text-ja .phg-exhaust'))
+      // 疲労アイコンをテキストに保存するために追加
       document.querySelectorAll('#text-ja .phg-exhaust').forEach((el) => {
         el.textContent = '[[exhaust]]'
       })
 
+      // 捨札アイコン
+      document.querySelectorAll('#text-ja .phg-discard').forEach((el) => {
+        el.textContent = '[[discard]]'
+      })
+
       this.card.text_ja = document.querySelector('#text-ja').textContent.trim()
 
-      // 取得し終わったら削除
+      // 取得し終わったら疲労トークンのテキストを削除
       document.querySelectorAll('#text-ja .phg-exhaust').forEach((el) => {
         el.textContent = ''
       })
 
-      console.log(this.card.text_ja)
+      document.querySelectorAll('#text-ja .phg-discard').forEach((el) => {
+        el.textContent = ''
+      })
+
+      // 疲労影響なしの能力を * に変える
+      this.card.text_ja = this.card.text_ja.replace('(Inexhaustible effect)', '*')
 
       await fetch(`${import.meta.env.VITE_API_URL}/v2/cards/${this.stub}/update-ja`, {
         method: 'post',
