@@ -323,6 +323,7 @@ export default {
     request(`/v2/cards/${this.stub}/details${this.showLegacy ? '?show_legacy=true' : ''}`)
       .then((response) => {
         this.card = response.data.card
+        console.log(this.card)
         this.entity_id = response.data.entity_id
         this.last_seen_entity_id = response.data.last_seen_entity_id
         this.usage = response.data.usage
@@ -414,8 +415,22 @@ export default {
       })
     },
     async saveJapaneseText() {
-      this.card.name_ja = document.querySelector('#name-ja').innerText.trim()
-      this.card.text_ja = document.querySelector('#text-ja').innerText.trim()
+      this.card.name_ja = document.querySelector('#name-ja').textContent.trim()
+
+      // 疲労トークンをテキストに保存するために追加
+      console.log(document.querySelectorAll('#text-ja .phg-exhaust'))
+      document.querySelectorAll('#text-ja .phg-exhaust').forEach((el) => {
+        el.textContent = '[[exhaust]]'
+      })
+
+      this.card.text_ja = document.querySelector('#text-ja').textContent.trim()
+
+      // 取得し終わったら削除
+      document.querySelectorAll('#text-ja .phg-exhaust').forEach((el) => {
+        el.textContent = ''
+      })
+
+      console.log(this.card.text_ja)
 
       await fetch(`${import.meta.env.VITE_API_URL}/v2/cards/${this.stub}/update-ja`, {
         method: 'post',
