@@ -5,7 +5,8 @@
         class="flex-auto h-10 mb-4 md:pr-4 md:mb-0"
         placeholder="Filter by title..."
         v-model:search="filterText"
-        :is-disabled="isDisabled"></clearable-search>
+        :is-disabled="isDisabled"
+      ></clearable-search>
       <phoenixborn-picker
         class="flex-auto h-10 mb-4 md:pr-4 md:mb-0"
         placeholder="Filter by Phoenixborn..."
@@ -20,8 +21,13 @@
     <div v-if="cardFilters" class="text-sm">
       Decks including:
       <ul class="inline-block">
-        <li v-for="stub of cardFilters" class="inline-block rounded-full bg-blue-light text-gray-dark px-2 mr-2">
-          {{ cardDetails(stub).name }} <i class="fas fa-times-circle cursor-pointer" @click="removeFromCardFilters(stub)"></i>
+        <li
+          v-for="stub of cardFilters"
+          :key="stub"
+          class="inline-block rounded-full bg-blue-light text-gray-dark px-2 mr-2"
+        >
+          {{ cardDetails(stub).name }}
+          <i class="fas fa-times-circle cursor-pointer" @click="removeFromCardFilters(stub)"></i>
         </li>
       </ul>
     </div>
@@ -38,7 +44,8 @@
     :currentPage="currentPage"
     :totalPage="totalPage"
     :show-mine="showMine"
-    :have-filters="!!filterText || !!phoenixborn"></deck-table>
+    :have-filters="!!filterText || !!phoenixborn"
+  ></deck-table>
 </template>
 
 <script>
@@ -51,11 +58,11 @@ import { trimmed } from '/src/utils/text.js'
 import PhoenixbornPicker from '../shared/PhoenixbornPicker.vue'
 import Toggle from '../shared/Toggle.vue'
 
-const DECKS_PER_PAGE = 30;
+const DECKS_PER_PAGE = 30
 
 export default {
   name: 'DeckListing',
-  setup () {
+  setup() {
     // Standard composite containing { toast, handleResponseError }
     return useHandleResponseError()
   },
@@ -84,30 +91,30 @@ export default {
     Toggle,
   },
   computed: {
-    showLegacy () {
+    showLegacy() {
       return !!this.$route.meta.showLegacy
     },
-    showRedRains () {
+    showRedRains() {
       return !!this.$route.meta.showRedRains
     },
-    havePreviousDecks () {
+    havePreviousDecks() {
       return this.offset > 0
     },
     haveNextDecks() {
       return this.offset + DECKS_PER_PAGE < this.deckCount
     },
     currentPage() {
-      return (this.offset / DECKS_PER_PAGE) + 1
+      return this.offset / DECKS_PER_PAGE + 1
     },
     totalPage() {
       return Math.ceil(this.deckCount / DECKS_PER_PAGE)
     },
-    cardFilters () {
+    cardFilters() {
       if (!this.card || !this.card.length) return null
       return Array.isArray(this.card) ? this.card : [this.card]
     },
   },
-  created () {
+  created() {
     // Before we do anything, we need to translate any query parameters into filters if we have any
     if (Object.keys(this.$route.query).length) {
       this.filterText = this.$route.query.q
@@ -148,32 +155,21 @@ export default {
         }
       })
     }, 750)
-    watch(
-      [
-        () => this.filterText,
-      ],
-      (curProps, prevProps) => {
-        if (firstPreviousProps === null) {
-          firstPreviousProps = prevProps
-        }
-        this.debouncedFilterCall(curProps, prevProps)
+    watch([() => this.filterText], (curProps, prevProps) => {
+      if (firstPreviousProps === null) {
+        firstPreviousProps = prevProps
       }
-    )
-    watch(
-      [
-        () => this.phoenixborn,
-        () => this.preconOnly
-      ],
-      (curProps, prevProps) => {
-        this.offset = 0
-        this.filterList(() => {})
-      }
-    )
+      this.debouncedFilterCall(curProps, prevProps)
+    })
+    watch([() => this.phoenixborn, () => this.preconOnly], (curProps, prevProps) => {
+      this.offset = 0
+      this.filterList(() => {})
+    })
     // Trigger initial listing load
     this.filterList()
   },
   methods: {
-    clearFilters () {
+    clearFilters() {
       this.filterText = ''
       this.phoenixborn = null
       this.player = null
@@ -181,59 +177,62 @@ export default {
       this.offset = 0
       this.preconOnly = false
     },
-    fetchDecks ({endpoint = null, options = {}, failureCallback = null} = {}) {
+    fetchDecks({ endpoint = null, options = {}, failureCallback = null } = {}) {
       if (!endpoint) {
         endpoint = this.showMine ? '/v2/decks/mine' : '/v2/decks'
       }
       this.isDisabled = true
-      request(endpoint, options).then((response) => {
-        // Update our query string with the currently set filters
-        const query = {}
+      request(endpoint, options)
+        .then((response) => {
+          // Update our query string with the currently set filters
+          const query = {}
 
-        if (this.filterText) {
-          query.q = this.filterText
-        }
-        if (this.phoenixborn) {
-          query.phoenixborn = this.phoenixborn
-        }
-        if (this.player) {
-          query.player = this.player
-        }
-        if (this.card) {
-          query.card = this.card
-        }
-        if (this.offset) {
-          query.offset = this.offset
-        }
-        if (this.preconOnly) {
-          // Setting to null makes it an opt-in parameter that doesn't show a value
-          query.preconstructed = null
-        }
-        // Only push to router is query has changed. In the case of scrolling, we don't want to push as
-        // it's the same url but pushing to the router will make it scroll back to top
-        this.$router.push({
-          path: this.$route.path,
-          query: query,
+          if (this.filterText) {
+            query.q = this.filterText
+          }
+          if (this.phoenixborn) {
+            query.phoenixborn = this.phoenixborn
+          }
+          if (this.player) {
+            query.player = this.player
+          }
+          if (this.card) {
+            query.card = this.card
+          }
+          if (this.offset) {
+            query.offset = this.offset
+          }
+          if (this.preconOnly) {
+            // Setting to null makes it an opt-in parameter that doesn't show a value
+            query.preconstructed = null
+          }
+          // Only push to router is query has changed. In the case of scrolling, we don't want to push as
+          // it's the same url but pushing to the router will make it scroll back to top
+          this.$router.push({
+            path: this.$route.path,
+            query: query,
+          })
+          // Clear everything out if we have no actual results (makes logical comparisons easier)
+          if (response.data.count === 0) {
+            this.decks = null
+            this.nextDecksURL = null
+            return
+          }
+
+          this.deckCount = response.data.count
+          this.decks = response.data.results
         })
-        // Clear everything out if we have no actual results (makes logical comparisons easier)
-        if (response.data.count === 0) {
-          this.decks = null
-          this.nextDecksURL = null
-          return
-        }
-
-        this.deckCount = response.data.count
-        this.decks = response.data.results
-      }).catch(error => {
-        this.handleResponseError(error)
-        // Reset the filters, if necessary
-        if (failureCallback) failureCallback()
-      }).finally(() => {
-        this.isDisabled = false
-      })
+        .catch((error) => {
+          this.handleResponseError(error)
+          // Reset the filters, if necessary
+          if (failureCallback) failureCallback()
+        })
+        .finally(() => {
+          this.isDisabled = false
+        })
     },
     // Default method for running a new filter using the current filter settings
-    filterList (failureCallback) {
+    filterList(failureCallback) {
       // Query our list of decks
       const params = {
         offset: this.offset,
@@ -254,19 +253,19 @@ export default {
       if (this.preconOnly) params.show_preconstructed = true
       this.fetchDecks({ options: { params }, failureCallback })
     },
-    loadNext () {
+    loadNext() {
       this.offset += DECKS_PER_PAGE
       this.filterList()
     },
-    loadPrevious () {
+    loadPrevious() {
       this.offset -= DECKS_PER_PAGE
       this.filterList()
     },
-    cardDetails (stub) {
+    cardDetails(stub) {
       const details = this.$store.state.cards.stubMap[stub]
-      return details ? details : {name: stub}
+      return details ? details : { name: stub }
     },
-    removeFromCardFilters (stub) {
+    removeFromCardFilters(stub) {
       if (this.card == stub) this.card = null
       else {
         this.card.splice(this.card.indexOf(stub), 1)

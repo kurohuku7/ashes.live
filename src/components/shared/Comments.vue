@@ -6,14 +6,20 @@
       <i class="fas fa-circle-notch fa-spin"></i> Loading...
     </div>
     <div v-else-if="error" class="text-red bg-red-lightest border border-red my-4 p-2">
-      Error loading comments; please notify Skaak on <a href="https://discord.gg/UU5bduq" class="text-red font-bold">Discord</a> or <a href="https://www.boardgamegeek.com/user/Skaak" class="text-red font-bold">BoardGameGeek</a>.
+      Error loading comments; please notify Skaak on
+      <a href="https://discord.gg/UU5bduq" class="text-red font-bold">Discord</a> or
+      <a href="https://www.boardgamegeek.com/user/Skaak" class="text-red font-bold">BoardGameGeek</a
+      >.
     </div>
-    <div v-else-if="comments && !comments.length" class="text-gray mb-4">
-      No comments yet!
-    </div>
+    <div v-else-if="comments && !comments.length" class="text-gray mb-4">No comments yet!</div>
     <div v-else>
       <ol class="comments">
-        <li v-for="comment of comments" class="border border-gray mb-4" :id="`comment-${comment.entity_id}`">
+        <li
+          v-for="comment of comments"
+          :key="comment.entity_id"
+          class="border border-gray mb-4"
+          :id="`comment-${comment.entity_id}`"
+        >
           <div v-if="comment.is_deleted" class="bg-gray text-gray-dark font-bold">
             <i class="fas fa-trash"></i>
             <span v-if="comment.is_moderated">Deleted by moderator.</span>
@@ -23,14 +29,19 @@
             <div
               class="flex flex-wrap border-b-2 p-2 text-sm"
               :class="{
-                'bg-reaction border-reaction-dark': !lastSeenEntityId || comment.entity_id <= lastSeenEntityId,
-                'bg-inexhaustible border-inexhaustible-dark': lastSeenEntityId && comment.entity_id > lastSeenEntityId,
-              }">
+                'bg-reaction border-reaction-dark':
+                  !lastSeenEntityId || comment.entity_id <= lastSeenEntityId,
+                'bg-inexhaustible border-inexhaustible-dark':
+                  lastSeenEntityId && comment.entity_id > lastSeenEntityId,
+              }"
+            >
               <span class="grow">
                 <player-badge :user="comment.user" class="font-bold"></player-badge> says:
               </span>
               <a :href="`#comment-${comment.entity_id}`" class="text-gray-dark">
-                <time :datetime="comment.created">{{ this.formatCommentDate(comment.created) }} ago</time>&nbsp;<i class="fas fa-link"></i>
+                <time :datetime="comment.created"
+                  >{{ this.formatCommentDate(comment.created) }} ago</time
+                >&nbsp;<i class="fas fa-link"></i>
               </a>
             </div>
             <!-- The only reason we have a loading state is because otherwise the comment text doesn't update (it isn't possible to be properly reactive) -->
@@ -39,20 +50,29 @@
               v-else
               class="comment-body px-2 py-1 m-0"
               :content="comment.text"
-              needs-paragraphs></card-codes>
+              needs-paragraphs
+            ></card-codes>
           </div>
           <!-- TODO: add link to form for managing the comment -->
         </li>
       </ol>
       <div v-if="comments && comments.length">
-        <div class="my-4 text-center">
-          Page {{ page }} of {{ totalPages }}
-        </div>
+        <div class="my-4 text-center">Page {{ page }} of {{ totalPages }}</div>
         <div v-show="previousUrl || nextUrl" class="my-4 text-center">
-          <button v-show="previousUrl" class="btn btn-blue py-2 px-4 mr-4" :disabled="loading" @click="loadComments(previousUrl)">
+          <button
+            v-show="previousUrl"
+            class="btn btn-blue py-2 px-4 mr-4"
+            :disabled="loading"
+            @click="loadComments(previousUrl)"
+          >
             Previous
           </button>
-          <button  v-show="nextUrl" class="btn btn-blue py-2 px-4" :disabled="loading" @click="loadComments(nextUrl)">
+          <button
+            v-show="nextUrl"
+            class="btn btn-blue py-2 px-4"
+            :disabled="loading"
+            @click="loadComments(nextUrl)"
+          >
             Next
           </button>
         </div>
@@ -63,18 +83,26 @@
       <h3>Post a comment</h3>
 
       <div class="flex flex-nowrap mb-1">
-        <button class="btn btn-first"
-          :class="{active: commentWriteMode}"
-          @click="commentWriteMode = true">
-          Write
-        </button
-        ><button class="btn btn-last"
-          :class="{active: !commentWriteMode}"
+        <button
+          class="btn btn-first"
+          :class="{ active: commentWriteMode }"
+          @click="commentWriteMode = true"
+        >
+          Write</button
+        ><button
+          class="btn btn-last"
+          :class="{ active: !commentWriteMode }"
           :disabled="!commentText"
-          @click="commentWriteMode = false">
+          @click="commentWriteMode = false"
+        >
           Preview
         </button>
-        <link-alike class="ml-2 py-1" use-color use-underline @click="formattingHelpOpen = !formattingHelpOpen">
+        <link-alike
+          class="ml-2 py-1"
+          use-color
+          use-underline
+          @click="formattingHelpOpen = !formattingHelpOpen"
+        >
           <i class="fas fa-question-circle"></i>
           Formatting help
         </link-alike>
@@ -87,7 +115,9 @@
             <card-code-example :text="'[[main]] - 1 [[charm:class]]'"></card-code-example>
             <card-code-example :text="'[[Hammer Knight]]'"></card-code-example>
             <card-code-example :text="'[[Link https://ashteki.com]]'"></card-code-example>
-            <card-code-example :text="'[[*https://cdn.ashes.live/images/slices/channel-magic.jpg]]'"></card-code-example>
+            <card-code-example
+              :text="'[[*https://cdn.ashes.live/images/slices/channel-magic.jpg]]'"
+            ></card-code-example>
             <card-code-example :text="'* Unordered item 1\n* Unordered item 2'"></card-code-example>
             <card-code-example :text="'~ Ordered item 1\n~ Ordered item 2'"></card-code-example>
             <card-code-example :text="'> Quoted text'"></card-code-example>
@@ -105,14 +135,21 @@
         <div v-if="!commentWriteMode">
           <card-codes
             :content="commentText"
-            class="px-2 py-1 m-0 border-2 rounded px-4 py-2 border-inexhaustible-dark bg-inexhaustible"
-            needs-paragraphs></card-codes>
+            class="m-0 border-2 rounded px-4 py-2 border-inexhaustible-dark bg-inexhaustible"
+            needs-paragraphs
+          ></card-codes>
         </div>
         <div class="mt-2 md:flex">
           <p class="text-gray text-sm mb-4 mt-0 md:flex-1 md:order-2 md:pt-2 md:text-right">
-            Please respect the <router-link to="/policies/">Ashes.live Content Policies</router-link>.
+            Please respect the
+            <router-link to="/policies/">Ashes.live Content Policies</router-link>.
           </p>
-          <button class="btn btn-blue py-1 mb-4 w-full md:flex-none md:px-4 md:w-auto" :disabled="!commentText">Publish</button>
+          <button
+            class="btn btn-blue py-1 mb-4 w-full md:flex-none md:px-4 md:w-auto"
+            :disabled="!commentText"
+          >
+            Publish
+          </button>
         </div>
       </form>
     </div>
@@ -151,10 +188,10 @@ export default {
     commentWriteMode: true,
     formattingHelpOpen: false,
   }),
-  setup () {
+  setup() {
     // Standard composite containing { toast, handleResponseError }
     return {
-      ...useHandleResponseError()
+      ...useHandleResponseError(),
     }
   },
   components: {
@@ -165,16 +202,16 @@ export default {
     PlayerBadge,
     TextEditor,
   },
-  created () {
+  created() {
     if (this.$route.query.page) {
       this.page = this.$route.query.page
     }
   },
-  beforeMount () {
+  beforeMount() {
     this.loadComments()
   },
   watch: {
-    '$route.query' (to, from) {
+    '$route.query'(to, from) {
       // Make sure to update our page setting if we navigate here via browser back/forward
       if (to.page !== from.page) {
         this.page = to.page === undefined ? 1 : to.page
@@ -182,18 +219,18 @@ export default {
     },
   },
   computed: {
-    isAuthenticated () {
+    isAuthenticated() {
       return this.$store.getters['player/isAuthenticated']
     },
-    totalPages () {
+    totalPages() {
       return Math.ceil(this.commentCount / COMMENTS_PER_PAGE)
     },
   },
   methods: {
-    formatCommentDate (timestamp) {
+    formatCommentDate(timestamp) {
       return formatDistanceToNowStrict(parseISO(timestamp))
     },
-    loadComments (url) {
+    loadComments(url) {
       this.loading = true
       if (!url) {
         const offset = (this.page - 1) * COMMENTS_PER_PAGE
@@ -210,59 +247,63 @@ export default {
       if (this.page > 1) {
         query.page = this.page
       }
-      request(url).then(response => {
-        this.loading = false
-        // This means they tried to advance to a page beyond what we have results for
-        if (response.data.count && !response.data.results.length) {
-          this.toast.error("Page number for comments too high!")
-          return
-        }
-        this.comments = response.data.results
-        this.commentCount = response.data.count
-        this.previousUrl = response.data.previous
-        this.nextUrl = response.data.next
-        this.$router.push ({
-          path: this.$route.path,
-          query: query,
-        })
-
-        // Finally, update the user's subscription to this content, if they have one
-        if (this.comments && this.comments.length) {
-          const finalComment = this.comments[this.comments.length - 1]
-          if (this.lastSeenEntityId && this.lastSeenEntityId < finalComment.entity_id) {
-            request(`/v2/subscription/${this.entityId}`, {
-              method: 'patch',
-              data: {
-                last_seen_entity_id: finalComment.entity_id
-              }
-            })
+      request(url)
+        .then((response) => {
+          this.loading = false
+          // This means they tried to advance to a page beyond what we have results for
+          if (response.data.count && !response.data.results.length) {
+            this.toast.error('Page number for comments too high!')
+            return
           }
-        }
-      }).catch(error => {
-        console.log(error)
-        this.error = true
-        this.loading = false
-        this.comments = null
-        this.commentCount = 0
-        this.previousUrl = null
-        this.nextUrl = null
-      })
+          this.comments = response.data.results
+          this.commentCount = response.data.count
+          this.previousUrl = response.data.previous
+          this.nextUrl = response.data.next
+          this.$router.push({
+            path: this.$route.path,
+            query: query,
+          })
+
+          // Finally, update the user's subscription to this content, if they have one
+          if (this.comments && this.comments.length) {
+            const finalComment = this.comments[this.comments.length - 1]
+            if (this.lastSeenEntityId && this.lastSeenEntityId < finalComment.entity_id) {
+              request(`/v2/subscription/${this.entityId}`, {
+                method: 'patch',
+                data: {
+                  last_seen_entity_id: finalComment.entity_id,
+                },
+              })
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          this.error = true
+          this.loading = false
+          this.comments = null
+          this.commentCount = 0
+          this.previousUrl = null
+          this.nextUrl = null
+        })
     },
-    triggerLogin () {
-      emitter.emit("login:required")
+    triggerLogin() {
+      emitter.emit('login:required')
     },
-    submitComment () {
+    submitComment() {
       request(`/v2/comments/${this.entityId}`, {
         method: 'post',
-        data: { text: this.commentText }
-      }).then(() => {
-        this.commentText = ""
-        this.toast.success("Your comment has been posted!")
-        this.loadComments()
-      }).catch((error) => {
-        this.handleResponseError(error)
+        data: { text: this.commentText },
       })
+        .then(() => {
+          this.commentText = ''
+          this.toast.success('Your comment has been posted!')
+          this.loadComments()
+        })
+        .catch((error) => {
+          this.handleResponseError(error)
+        })
     },
-  }
+  },
 }
 </script>

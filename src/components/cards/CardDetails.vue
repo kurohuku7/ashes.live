@@ -417,29 +417,49 @@ export default {
     async saveJapaneseText() {
       this.card.name_ja = document.querySelector('#name-ja').textContent.trim()
 
-      // 疲労アイコンをテキストに保存するために追加
-      document.querySelectorAll('#text-ja .phg-exhaust').forEach((el) => {
-        el.textContent = '[[exhaust]]'
-      })
+      this.card.text_ja = ''
 
-      // 捨札アイコン
-      document.querySelectorAll('#text-ja .phg-discard').forEach((el) => {
-        el.textContent = '[[discard]]'
-      })
+      document.querySelectorAll('#text-ja > *').forEach((part) => {
+        // 疲労アイコンをテキストに保存するために追加
+        part.querySelectorAll('.phg-exhaust').forEach((el) => {
+          el.textContent = '[[exhaust]]'
+        })
 
-      this.card.text_ja = document.querySelector('#text-ja').textContent.trim()
+        // 捨札アイコン
+        part.querySelectorAll('#text-ja .phg-discard').forEach((el) => {
+          el.textContent = '[[discard]]'
+        })
 
-      // 取得し終わったら疲労トークンのテキストを削除
-      document.querySelectorAll('#text-ja .phg-exhaust').forEach((el) => {
-        el.textContent = ''
-      })
+        // 改行
+        if (part.tagName === 'br') {
+        }
 
-      document.querySelectorAll('#text-ja .phg-discard').forEach((el) => {
-        el.textContent = ''
+        if (part.classList.contains('inexhaustible-effects')) {
+          const paragraphs = []
+          part.querySelectorAll('p').forEach((p) => {
+            paragraphs.push(
+              '* ' + p.textContent.replace('(Inexhaustible effect) ', '').replace('&nbsp;', ' ')
+            )
+          })
+          this.card.text_ja += paragraphs.join('\n\n')
+        } else {
+          this.card.text_ja += part.textContent + '\n\n'
+        }
+
+        // 取得し終わったら疲労トークンのテキストを削除
+        part.querySelectorAll('.phg-exhaust').forEach((el) => {
+          el.textContent = ''
+        })
+
+        part.querySelectorAll('.phg-discard').forEach((el) => {
+          el.textContent = ''
+        })
       })
 
       // 疲労影響なしの能力を * に変える
-      this.card.text_ja = this.card.text_ja.replace('(Inexhaustible effect)', '*')
+      this.card.text_ja = this.card.text_ja.replace('(Inexhaustible effect) ', '\n\n* ')
+
+      console.log(this.card.text_ja)
 
       await fetch(`${import.meta.env.VITE_API_URL}/v2/cards/${this.stub}/update-ja`, {
         method: 'post',
