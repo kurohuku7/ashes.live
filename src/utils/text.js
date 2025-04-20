@@ -210,7 +210,7 @@ export function parseEffectText(text, isLegacy = false) {
     .replace(/<(\/?)li>/g, "<$1p>");
   // Bold ability names (&#39; is apostrophe)
   text = text.replace(
-    /(?:<p>|^)(<span class="alt-text">.+?<\/span>)?((?:[a-z 0-9!]|&#39;|[\u30A0-\u30FF\u3040-\u309F\u4E00-\u9FFF!])+[:：])(?= \w| <i class="phg-)/gi,
+    /(?:<p>|^)(<span class="alt-text">.+?<\/span>)?((?:[a-z 0-9!]|&#39;|[\u30A0-\u30FF\u3040-\u309F\u4E00-\u9FFF])+[:：])(?= \w| <i class="phg-)/gi,
     "<p>$1<strong>$2</strong>"
   );
   return text;

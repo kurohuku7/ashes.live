@@ -155,7 +155,7 @@
                 <strong
                   v-if="card.spellboard !== undefined"
                   class="inline-block border border-blue-dark px-1"
-                  >呪文置場 {{ card.spellboard }}</strong
+                  >魔法置場 {{ card.spellboard }}</strong
                 >
               </div>
               <div v-if="card.text">
@@ -341,6 +341,8 @@ export default {
 
         // And set the site title
         document.title = `${this.card.name} - Ashes.live`
+
+        this.card.text_ja = this.card.text_ja ?? this.card.text
       })
       .catch((error) => {
         this.error = true
@@ -376,9 +378,9 @@ export default {
         case 'Phoenixborn':
           return 'フェニックスボーン'
         case 'Ready Spell':
-          return '設置呪文'
+          return '設置魔法'
         case 'Action Spell':
-          return 'アクション呪文'
+          return '即時魔法'
         case 'Conjuration':
           return '召喚獣'
         case 'Ally':
@@ -390,7 +392,7 @@ export default {
     cardPlacementJa() {
       switch (this.card.placement) {
         case 'Spellboard':
-          return '呪文置場'
+          return '魔法置場'
         case 'Battlefield':
           return '戦場'
         case 'Discard':
